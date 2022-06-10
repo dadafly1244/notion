@@ -1,1 +1,1 @@
-# notion
+vue-router, pinia, 
