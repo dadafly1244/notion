@@ -3,16 +3,73 @@
   <button @click="workspaceStore.createWorkspace">
     워크스페이스 생성
   </button>
+  <!-- <button @click="workspaceStore.readWorkspaces">
+    워크스페이스 조회
+  </button> -->
+  
+  <section :key="$route.params.id">
+    <h1
+      ref="title"
+      placeholder="제목 없음"
+      contenteditable
+      @keydown.prevent.enter="$refs.content.focus()"
+      @blur="onInput">
+      {{ workspaceStore.workspace.title }}
+    </h1>
+    <p
+      ref="content"
+      placeholder="내용을 입력하세요."
+      contenteditable
+      @blur="onInput"
+      v-html="workspaceStore.workspace.content">
+    </p>
+  </section>
 </template>
 
 <script>
 import { mapStores } from 'pinia'
-import { useWorkSpaceStore } from '~/store/workspace'
+import { useWorkspaceStore } from '~/store/workspace'
 
 export default {
   computed: {
-    ...mapStores(useWorkSpaceStore)
+    ...mapStores(useWorkspaceStore)
+  },
+  watch: {//반응형데이터 감시!
+    $route(){ //페이지가 바뀔 때 마다 route(페이지정보)가 변경되었는지 감시해!!
+      this.workspaceStore.readWorkspace(this.$route.params.workspaceId) 
+    }
+  },
+  created() {
+    this.workspaceStore.readWorkspace(this.$route.params.workspaceId) 
+  },
+  methods: {
+    onInput() {
+      const title = this.$refs.title.textContent
+      const content = this.$refs.content.innerHTML
+      if(!title.trim()) {
+        this.$refs.title.innerHTML=''
+      }
+      if(!this.$refs.content.textContent.trim()) {
+        this.$refs.content.innerHTML=''
+      }
+
+      this.workspaceStore.updateWorkspace({
+        id: this.$route.params.workspaceId,
+        title,
+        content
+      })
+    }
   }
 }
-
+// route: 페이지정보
+// router: 
 </script>
+
+<style scoped lang="scss">
+[contenteditable] {
+  &:empty::before {//요소의 내용이 비워져 있을때
+    content: attr(placeholder);
+    color: lightgray;
+  }
+}
+</style>
