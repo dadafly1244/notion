@@ -1,4 +1,5 @@
 <template>
+  <TheHeader />
   <h1>Workspace!</h1>
   <button @click="workspaceStore.createWorkspace">
     워크스페이스 생성
@@ -8,6 +9,19 @@
   </button> -->
   
   <section :key="$route.params.id">
+    <div class="poster">
+      <img
+        v-if="workspaceStore.workspace.poster"
+        :src="workspaceStore.workspace.poster"
+        alt="Poster" />
+      <input
+        type="file" 
+        @change="selectPoster" />
+      <button
+        @click="deletePoster">
+        이미지 삭제!
+      </button>
+    </div>
     <h1
       ref="title"
       placeholder="제목 없음"
@@ -29,8 +43,12 @@
 <script>
 import { mapStores } from 'pinia'
 import { useWorkspaceStore } from '~/store/workspace'
+import TheHeader from '~/components/TheHeader.vue'
 
 export default {
+  components: {
+    TheHeader
+  },
   computed: {
     ...mapStores(useWorkspaceStore)
   },
@@ -57,6 +75,25 @@ export default {
         id: this.$route.params.workspaceId,
         title,
         content
+      })
+    },
+    selectPoster(event) {
+      const { files } = event.target
+      for (const file of files) {
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.addEventListener('load', e => { //reader가 파일을 다 읽으면
+          this.workspaceStore.updateWorkspace({
+            id: this.$route.params.workspaceId,
+            poster: e.target.result//base64코드가 들어있음
+          })
+        })
+      }
+    },
+    deletePoster() {
+      this.workspaceStore.updateWorkspace({
+        id: this.$route.params.workspaceId,
+        poster: '-1'
       })
     }
   }
