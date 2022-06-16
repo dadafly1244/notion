@@ -8,7 +8,7 @@
     워크스페이스 조회
   </button> -->
   
-  <section :key="$route.params.id">
+  <section :key="$route.params.workspaceId">
     <div class="poster">
       <img
         v-if="workspaceStore.workspace.poster"

@@ -1,5 +1,4 @@
 import {defineStore} from 'pinia'
-import router from '~/routes' //index.js 생략가능
 
 export const useWorkspaceStore = defineStore('workspace',{
   state() {
@@ -7,6 +6,7 @@ export const useWorkspaceStore = defineStore('workspace',{
       // workspace: null, 
       workspace: {}, 
       workspaces: [],
+      workspacesLoaded: false,
       currentWorkspacePath: []
     }
   },
@@ -26,6 +26,9 @@ export const useWorkspaceStore = defineStore('workspace',{
       })
       console.log(workspace)
       this.readWorkspaces()
+      // this.$router.push('./login')랑 router랑 같음
+      // router.push(`/workspaces/${workspace.id}`) //에러가 나서 그냥 밑코드로 바꿔!!ㄴ
+      window.location.href=`/workspaces/${workspace.id}`
     },
     async readWorkspaces() {
       const workspaces = await request({
@@ -33,6 +36,11 @@ export const useWorkspaceStore = defineStore('workspace',{
       })
       // console.log(workspaces)
       this.workspaces = workspaces
+      this.workspacesLoaded = true
+
+      if(!this.workspaces.length){ //아무것도 안들어있으면!
+        this.createWorkspace()
+      }
     },
     async readWorkspace(id) {
       const workspace = await request({
@@ -72,16 +80,14 @@ export const useWorkspaceStore = defineStore('workspace',{
       // 2 - 목록을 서버에서 다시 가져오기! // 최적화는 아니지만 편함!
       this.readWorkspaces()
     },
-    findWorkspacePath() { //재귀를 써서 아래에서 위로 부모를 찾아낼것임!
-      const currentWorkspaceId = router.currentRoute.value.params.id
+    findWorkspacePath(currentWorkspaceId) { //재귀를 써서 아래에서 위로 부모를 찾아낼것임!
       const find = (workspace, parents) => {
-        if(currentWorkspaceId === workspace.id) {
+        if(currentWorkspaceId === workspace.id) { //현제워크스페이스 아이디와 워크스페이스 아이디가 같으면
           this.currentWorkspacePath = [...parents, workspace] //전역 상태 부분에 배열을 추가
-          
         }
         if (workspace.children) { //만약 객체에 자식요소가 있다면 
           workspace.children.forEach(ws => {
-            find(ws,[...parents, workspace]) //...parents얕은 복사 
+            find(ws, [...parents, workspace]) //...parents얕은 복사 
           })
         }
       }
@@ -89,9 +95,7 @@ export const useWorkspaceStore = defineStore('workspace',{
         find(workspace, [])//최상위만 돌리기 때문에 부모가 없어서 빈배열!
       }) 
     }
-    
   }
-
 })
 
 
