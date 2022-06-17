@@ -50,7 +50,7 @@ export default {
     TheHeader
   },
   computed: {
-    ...mapStores(useWorkspaceStore)
+    ...mapStores(useWorkspaceStore)// workspace Store에 대한 액세스 권한 부여
   },
   watch: {//반응형데이터 감시!
     $route(){ //페이지가 바뀔 때 마다 route(페이지정보)가 변경되었는지 감시해!!
@@ -99,7 +99,7 @@ export default {
   }
 }
 // route: 페이지정보
-// router: 
+// router: 동작, 명령
 </script>
 
 <style scoped lang="scss">

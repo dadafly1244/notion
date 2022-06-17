@@ -1,7 +1,6 @@
 <template>
   <header>
     Header!!
-    <!-- ul태그가 출력이 안되여..ㅠㅠ -->
     <ul> 
       <li
         v-for="path in workspaceStore.currentWorkspacePath"
@@ -11,7 +10,6 @@
         </RouterLink>
       </li>
     </ul>
-    []
   </header>
 </template>
 
